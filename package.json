@@ -2,9 +2,9 @@
   "name": "server",
   "version": "1.0.0",
   "description": "web socket server",
-  "main": "server/index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon server/index.js"
+    "dev": "nodemon server.js"
   },
   "author": "cw",
   "license": "ISC",
