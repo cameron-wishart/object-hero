@@ -51,12 +51,28 @@ io.on('connection', socket => {
 
     socket.emit('init', 'hello')
 
-    // socket.on('keypress', () => {
-    //     console.log('press')
-    //     state.players[socket.id].x += 1;
-    // })
+    socket.on('keypress', (key) => {
 
-    //startGameInterval(socket, state)
+        switch (key) {
+            case 'w':
+                state.players[socket.id].y -= 10;
+                break;
+            case 's':
+                state.players[socket.id].y += 10;
+                break;
+            case 'a':
+                state.players[socket.id].x -= 10;
+                break;
+            case 'd':
+                state.players[socket.id].x += 10;
+                break;
+            default:
+            // code block
+        }
+
+    })
+
+    startGameInterval(socket, state)
 
 
     socket.on('disconnect', () => {
@@ -68,7 +84,7 @@ io.on('connection', socket => {
 function startGameInterval(socket, state) {
     const interval = setInterval(() => {
         socket.emit('tick', state)
-    }, 1000 / 10)
+    }, 1000 / 20)
 }
 
 server.listen(process.env.PORT || 3000, () => {
