@@ -2,18 +2,33 @@
 // const io = require('socket.io')(http, {
 //     cors: { origin: '*' }
 // })
+// const express = require('express');
+// const socketIO = require('socket.io');
+
+// //const io = require('socket.io')()
+// const PORT = process.env.PORT || 3000;
+// const INDEX = 'client/index.html';
+
+// const server = express()
+//     .use((req, res) => res.sendFile('./client/index.html', { root: __dirname }))
+//     .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+
+// const socketserver = express().listen(3001)
+// const io = socketIO(socketserver);
+
 const express = require('express');
-const socketIO = require('socket.io');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 
-//const io = require('socket.io')()
-const PORT = process.env.PORT || 3000;
-const INDEX = 'client/index.html';
+app.use(express.static('client'))
 
-const server = express()
-    .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
-    .listen(PORT, () => console.log(`Listening on ${PORT}`));
-
-const io = socketIO(server);
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
 const state = {
     players:
@@ -33,13 +48,15 @@ const state = {
 io.on('connection', socket => {
     console.log('a user connected');
     state.players[socket.id] = { x: 10, y: 10 }
-    socket.emit('init', state.players)
 
-    socket.on('keypress', () => {
-        state.players[socket.id].x += 1;
-    })
+    socket.emit('init', 'hello')
 
-    startGameInterval(socket, state)
+    // socket.on('keypress', () => {
+    //     console.log('press')
+    //     state.players[socket.id].x += 1;
+    // })
+
+    //startGameInterval(socket, state)
 
 
     socket.on('disconnect', () => {
@@ -54,6 +71,6 @@ function startGameInterval(socket, state) {
     }, 1000 / 10)
 }
 
-
-
-//http.listen(3000, () => console.log('listening on http://localhost:3000'))
+server.listen(3000, () => {
+    console.log('listening on *:3000');
+});
