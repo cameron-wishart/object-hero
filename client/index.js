@@ -1,4 +1,4 @@
-const socket = io('ws://localhost:3000')
+const socket = io()
 
 //colors
 BG_COLOR = '#c2c2c2'

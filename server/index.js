@@ -1,6 +1,17 @@
-const http = require('http').createServer()
+// const http = require('http').createServer()
+// const io = require('socket.io')(http, {
+//     cors: { origin: '*' }
+// })
+const express = require('express')
+//const io = require('socket.io')()
+const PORT = process.env.PORT || 3000;
+const INDEX = '../client/index.html';
 
-const io = require('socket.io')(http, {
+const server = express()
+    .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+    .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const io = require('socket.io')(server, {
     cors: { origin: '*' }
 })
 
@@ -40,9 +51,9 @@ io.on('connection', socket => {
 function startGameInterval(socket, state) {
     const interval = setInterval(() => {
         socket.emit('tick', state)
-    }, 1000 / 20)
+    }, 1000 / 10)
 }
 
 
 
-http.listen(process.env.PORT || 3000, () => console.log('listening on http://localhost:3000'))
+//http.listen(3000, () => console.log('listening on http://localhost:3000'))
