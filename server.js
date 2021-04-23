@@ -84,7 +84,7 @@ io.on('connection', socket => {
 function startGameInterval(socket, state) {
     const interval = setInterval(() => {
         socket.emit('tick', state)
-    }, 1000 / 20)
+    }, 1000 / 10)
 }
 
 server.listen(process.env.PORT || 3000, () => {
