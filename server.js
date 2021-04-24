@@ -1,22 +1,4 @@
-// const http = require('http').createServer()
-// const io = require('socket.io')(http, {
-//     cors: { origin: '*' }
-// })
-// const express = require('express');
-// const socketIO = require('socket.io');
-
-// //const io = require('socket.io')()
-// const PORT = process.env.PORT || 3000;
-// const INDEX = 'client/index.html';
-
-// const server = express()
-//     .use((req, res) => res.sendFile('./client/index.html', { root: __dirname }))
-//     .listen(PORT, () => console.log(`Listening on ${PORT}`));
-
-
-// const socketserver = express().listen(3001)
-// const io = socketIO(socketserver);
-
+const { createGameState, handleKeyPress, gameLoop } = require('./game');
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -30,47 +12,21 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-const state = {
-    players:
-    {
 
-    }
-    ,
-    map:
-        [
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        ]
-}
+const state = createGameState()
+
 
 io.on('connection', socket => {
     console.log('a user connected');
-    state.players[socket.id] = { x: 10, y: 10 }
+    state.players[socket.id] = { x: 10, y: 10, velX: 0, velY: 0, speed: 4, inventory: [] }
 
     socket.emit('init', 'hello')
 
-    socket.on('keypress', (key) => {
-
-        switch (key) {
-            case 'w':
-                state.players[socket.id].y -= 10;
-                break;
-            case 's':
-                state.players[socket.id].y += 10;
-                break;
-            case 'a':
-                state.players[socket.id].x -= 10;
-                break;
-            case 'd':
-                state.players[socket.id].x += 10;
-                break;
-            default:
-            // code block
-        }
+    socket.on('keypress', (keyPresses) => {
+        handleKeyPress(keyPresses, state, socket);
 
     })
+
 
     startGameInterval(socket, state)
 
@@ -84,7 +40,8 @@ io.on('connection', socket => {
 function startGameInterval(socket, state) {
     const interval = setInterval(() => {
         socket.emit('tick', state)
-    }, 1000 / 10)
+        gameLoop(state, socket)
+    }, 1000 / 30)
 }
 
 server.listen(process.env.PORT || 3000, () => {

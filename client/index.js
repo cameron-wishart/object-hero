@@ -21,13 +21,17 @@ socket.on('tick', (msg) => {
 
 window.addEventListener('keydown', keyDownListener);
 function keyDownListener(event) {
-    keyPresses[event.key] = true;
-    socket.emit('keypress', event.key)
+    if (!keyPresses[event.key] === true) {
+
+        keyPresses[event.key] = true;
+        socket.emit('keypress', keyPresses)
+    }
 }
 
 window.addEventListener('keyup', keyUpListener);
 function keyUpListener(event) {
-    keyPresses[event.key] = false;
+    delete keyPresses[event.key]
+    socket.emit('keypress', keyPresses)
 }
 
 
