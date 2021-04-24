@@ -13,18 +13,21 @@ app.get('/', (req, res) => {
 });
 
 
-const state = createGameState()
+const main = createGameState()
 
+const world = {
+    main: createGameState()
+}
 
 io.on('connection', socket => {
     console.log('a user connected');
-    state.players[socket.id] = { x: 10, y: 10, velX: 0, velY: 0, speed: 4, inventory: [] }
+    //set player in starting map
+    world['main'].players[socket.id] = { x: 10, y: 10, velX: 0, velY: 0, speed: 1, inventory: [] }
 
     socket.emit('init', 'hello')
 
     socket.on('keypress', (keyPresses) => {
-        handleKeyPress(keyPresses, state, socket);
-
+        handleKeyPress(keyPresses, state, socket)
     })
 
 
