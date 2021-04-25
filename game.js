@@ -30,8 +30,24 @@ function createGameState() {
 function gameLoop(state) {
 
     for (player in state.players) {
-        state.players[player].x += state.players[player].velX * state.players[player].speed
-        state.players[player].y += state.players[player].velY * state.players[player].speed
+        const item = state.players[player]
+        if (item.x <= 0)
+            item.x = 1
+        else if (item.x >= 368)
+            item.x = 367
+        else
+            item.x += item.velX * item.speed
+
+        if (item.y <= 0)
+            item.y = 1
+        else if (item.y >= 364)
+            item.y = 363
+        else
+            item.y += item.velY * item.speed
+
+        //item.y += item.velY * item.speed
+
+
     }
 }
 

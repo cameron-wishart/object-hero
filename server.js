@@ -4,6 +4,7 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
+const { stat } = require('fs');
 const io = new Server(server);
 
 app.use(express.static('client'))
@@ -13,38 +14,59 @@ app.get('/', (req, res) => {
 });
 
 
-const main = createGameState()
-
-const world = {
-    main: createGameState()
-}
+const clientRooms = {}
+const state = {}
 
 io.on('connection', socket => {
     console.log('a user connected');
-    //set player in starting map
-    world['main'].players[socket.id] = { x: 10, y: 10, velX: 0, velY: 0, speed: 1, inventory: [] }
 
-    socket.emit('init', 'hello')
-
-    socket.on('keypress', (keyPresses) => {
-        handleKeyPress(keyPresses, state, socket)
+    //socket.on('newGame', handleNewGame)
+    socket.on('joinGame', () => {
+        if (state['main'] === undefined)
+            handleNewGame()
+        else
+            handleJoinGame()
     })
 
+    function handleJoinGame() {
+        console.log('joining')
+        socket.join('main')
+        state['main'].players[socket.id] = { x: 10, y: 10, velX: 0, velY: 0, speed: 4, inventory: [] }
+        clientRooms[socket.id] = 'main'
 
-    startGameInterval(socket, state)
+    }
 
+    function handleNewGame() {
+        console.log('creating')
+        clientRooms[socket.id] = 'main'
+        state['main'] = createGameState()
+        socket.join('main')
+        state['main'].players[socket.id] = { x: 10, y: 10, velX: 0, velY: 0, speed: 4, inventory: [] }
+        startGameInterval('main')
+
+    }
+
+    socket.on('keypress', (keyPresses) => {
+        handleKeyPress(keyPresses, state['main'], socket)
+    })
 
     socket.on('disconnect', () => {
-        delete state.players[socket.id]
+        if (state['main']?.players[socket.id])
+            delete state['main'].players[socket.id]
         console.log('Client disconnected')
     });
 })
 
-function startGameInterval(socket, state) {
-    const interval = setInterval(() => {
-        socket.emit('tick', state)
-        gameLoop(state, socket)
-    }, 1000 / 30)
+function startGameInterval(roomName) {
+    const intervalId = setInterval(() => {
+        gameLoop(state[roomName])
+        emitGameState(roomName, state[roomName])
+    }, 1000 / 30);
+}
+
+function emitGameState(room, gameState) {
+    // Send this event to everyone in the room.
+    io.sockets.in('main').emit('gameState', gameState)
 }
 
 server.listen(process.env.PORT || 3000, () => {

@@ -17,32 +17,33 @@ image.onload = function () {
 };
 
 //socket events
+socket.on('gameState', (state) => { handleGame(state) })
 
-socket.on('tick', (msg) => {
-    paintGame(msg)
+
+document.getElementById("start_button").addEventListener("click", () => {
+    init()
+    socket.emit('joinGame', 'player joining')
 })
 
-window.addEventListener('keydown', keyDownListener);
-function keyDownListener(event) {
-    if (!keyPresses[event.key] === true) {
 
-        keyPresses[event.key] = true;
+function init() {
+
+
+
+    window.addEventListener('keydown', keyDownListener);
+    function keyDownListener(event) {
+        if (!keyPresses[event.key] === true) {
+
+            keyPresses[event.key] = true;
+            socket.emit('keypress', keyPresses)
+        }
+    }
+
+    window.addEventListener('keyup', keyUpListener);
+    function keyUpListener(event) {
+        delete keyPresses[event.key]
         socket.emit('keypress', keyPresses)
     }
-}
-
-window.addEventListener('keyup', keyUpListener);
-function keyUpListener(event) {
-    delete keyPresses[event.key]
-    socket.emit('keypress', keyPresses)
-}
-
-
-socket.on('init', handleInit)
-
-function handleInit(msg) {
-    socket.emit("hello", msg)
-    console.log(msg)
 }
 
 function paintGame(state) {
@@ -87,5 +88,6 @@ function paintPlayers(players) {
 }
 
 function handleGame(state) {
-    requestAnimationFrame(state)
+    //requestAnimationFrame(state)
+    requestAnimationFrame(() => paintGame(state))
 }
