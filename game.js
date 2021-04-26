@@ -49,23 +49,19 @@ function gameLoop(state) {
 
 
         if ((state.map[TL] === 1 || state.map[BL] === 1) && item.velX === -1) {
-            console.log('x')
             item.velX = 0
             item.x = (Math.floor(tempX / gridSize) * gridSize)
         }
         else if ((state.map[BR] === 1 || state.map[TR] === 1) && item.velX === 1) {
-            console.log('x')
             item.velX = 0
             item.x = (Math.floor(tempX / gridSize) * gridSize) + 18
         }
 
         if ((state.map[BRT] === 1 || state.map[BLT] === 1) && item.velY === 1) {
-            console.log('y')
             item.velY = 0
             item.y = (Math.floor((tempY) / gridSize) * gridSize) + 17
         }
         else if ((state.map[TRT] === 1 || state.map[TLT] === 1) && item.velY === -1) {
-            console.log('y')
             item.velY = 0
             item.y = (Math.floor(tempY / gridSize) * gridSize) + 1
         }
