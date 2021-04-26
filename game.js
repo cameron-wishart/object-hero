@@ -37,21 +37,20 @@ function gameLoop(state) {
         let tempY = item.y
         let tempX = item.x
 
-        let locationTL = (Math.floor((tempY + (item.velY * item.speed) - 2) / gridSize) * 8) + Math.floor((tempX + (item.velX * item.speed) - 2) / gridSize)
+        let locationTL = (Math.floor((tempY + (item.velY * item.speed)) / gridSize) * 8) + Math.floor((tempX + (item.velX * item.speed)) / gridSize)
         let locationBR = (Math.floor((tempY + (item.velY * item.speed) + 32) / 50) * 8) + (Math.floor((tempX + (item.velX * item.speed) + 32) / 50))
         let locationBL = (Math.floor((tempY + (item.velY * item.speed) + 32) / 50) * 8) + (Math.floor((tempX + (item.velX * item.speed)) / 50))
         let locationTR = (Math.floor((tempY + (item.velY * item.speed)) / 50) * 8) + (Math.floor((tempX + (item.velX * item.speed) + 32) / 50))
         console.log('bl ', locationBL, ' br ', locationBR)
-        if (state.map[locationTL] === 1 && state.map[locationBL] && item.velX === -1) {
-            console.log(locationTL)
+        if (state.map[locationTL] === 1 && state.map[locationBL] === 1 && item.velX === -1) {
             item.velX = 0
-            item.x = (Math.floor((tempX + (item.velX * item.speed) - 2) / gridSize) * 50) + 50
+            item.x = (Math.floor((tempX + (item.velX * item.speed)) / gridSize) * 50) + 49
         }
-        else if (state.map[locationBR] === 1 && item.velX === 1) {
+        else if (state.map[locationBR] === 1 && state.map[locationTR] === 1 && item.velX === 1) {
             item.velX = 0
             item.x = (Math.floor((tempX + (item.velX * item.speed) - 2) / gridSize) * 50) + 18
         }
-        else if (state.map[locationBR] === 1 && state.map[locationBL] && item.velY === 1) {
+        else if (state.map[locationBR] === 1 && state.map[locationBL] === 1 && item.velY === 1) {
             item.velY = 0
             item.y = (Math.floor((tempY + (item.velY * item.speed) - 2) / gridSize) * 50) + 18
         }
