@@ -11,11 +11,28 @@ let ctx = canvas.getContext('2d');
 let keyPresses = {};
 
 const image = new Image()
-image.src = './assets/greencapsheet.png';
+image.src = './assets/hero.png';
 image.onload = function () {
     console.log('loaded')
 };
 
+const grass = new Image()
+grass.src = './assets/grass-tile.png';
+grass.onload = function () {
+    console.log('grass loaded')
+};
+
+const grassTwo = new Image()
+grassTwo.src = './assets/grass-tile-3.png';
+grassTwo.onload = function () {
+    console.log('grass loaded')
+};
+
+const tileSheet = new Image()
+tileSheet.src = './assets/tiles-map.png';
+tileSheet.onload = function () {
+    console.log('tilemap loaded')
+};
 //socket events
 socket.on('gameState', (state) => { handleGame(state) })
 
@@ -60,12 +77,14 @@ function paintMap(state) {
         let height = gridSize * row
         switch (state.map[i]) {
             case 0:
-                ctx.fillStyle = BG_COLOR
-                ctx.fillRect(xPos, height, gridSize, gridSize)
+                ctx.drawImage(grass, 0, 0, 32, 32, xPos, height, gridSize, gridSize)
+                //ctx.fillRect(xPos, height, gridSize, gridSize)
                 break;
             case 1:
-                ctx.fillStyle = PLAYER_COLOR
-                ctx.fillRect(xPos, height, gridSize, gridSize)
+                //ctx.fillStyle = PLAYER_COLOR
+                ctx.drawImage(grassTwo, 0, 0, 32, 32, xPos, height, gridSize, gridSize)
+
+                //ctx.fillRect(xPos, height, gridSize, gridSize)
                 break;
             default:
         }
@@ -81,13 +100,13 @@ function paintMap(state) {
 
 function paintPlayers(players) {
     for (let player in players) {
-        ctx.fillStyle = BG_COLOR
-        ctx.drawImage(image, 0, 0, 16, 16, players[player].x, players[player].y, 32, 32)
-        //ctx.fillRect(players[player].x, players[player].y, 32, 32)
+        ctx.save()
+        ctx.scale(-1, 1)
+        ctx.drawImage(image, 0, 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
+        ctx.restore()
     }
 }
 
 function handleGame(state) {
-    //requestAnimationFrame(state)
     requestAnimationFrame(() => paintGame(state))
 }
