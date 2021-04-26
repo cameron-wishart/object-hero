@@ -18,8 +18,8 @@ function createGameState() {
                 0, 0, 1, 1, 0, 0, 0, 1,
                 1, 0, 0, 1, 0, 0, 0, 1,
                 1, 0, 0, 1, 0, 0, 0, 1,
-                1, 0, 0, 1, 0, 0, 0, 1,
-                1, 0, 0, 1, 0, 0, 0, 1,
+                1, 0, 0, 1, 1, 0, 0, 1,
+                1, 0, 0, 0, 0, 0, 0, 1,
                 1, 0, 0, 0, 0, 0, 0, 1,
                 1, 0, 0, 1, 0, 0, 0, 1,
                 1, 0, 0, 1, 0, 0, 0, 1,
@@ -29,7 +29,7 @@ function createGameState() {
 
 function gameLoop(state) {
 
-    const gridSize = 50
+    const gridSize = 400 / state.gridSize
 
 
     for (player in state.players) {
@@ -37,53 +37,64 @@ function gameLoop(state) {
         let tempY = item.y
         let tempX = item.x
 
-        let locationTL = (Math.floor((tempY + (item.velY * item.speed)) / gridSize) * 8) + Math.floor((tempX + (item.velX * item.speed)) / gridSize)
-        let locationBR = (Math.floor((tempY + (item.velY * item.speed) + 32) / 50) * 8) + (Math.floor((tempX + (item.velX * item.speed) + 32) / 50))
-        let locationBL = (Math.floor((tempY + (item.velY * item.speed) + 32) / 50) * 8) + (Math.floor((tempX + (item.velX * item.speed)) / 50))
-        let locationTR = (Math.floor((tempY + (item.velY * item.speed)) / 50) * 8) + (Math.floor((tempX + (item.velX * item.speed) + 32) / 50))
-        console.log('bl ', locationBL, ' br ', locationBR)
-        if (state.map[locationTL] === 1 && state.map[locationBL] === 1 && item.velX === -1) {
+        let TL = (Math.floor((tempY + 4) / gridSize) * state.gridSize) + Math.floor((tempX + (item.velX * item.speed) - 4) / gridSize)
+        let BR = (Math.floor((tempY + 30) / gridSize) * state.gridSize) + (Math.floor((tempX + (item.velX * item.speed) + 34) / gridSize))
+        let BL = (Math.floor((tempY + 30) / gridSize) * state.gridSize) + (Math.floor((tempX + (item.velX * item.speed) - 4) / gridSize))
+        let TR = (Math.floor((tempY + 4) / gridSize) * state.gridSize) + (Math.floor((tempX + (item.velX * item.speed) + 34) / gridSize))
+
+        let TLT = (Math.floor((tempY + (item.velY * item.speed) - 2) / gridSize) * state.gridSize) + Math.floor((tempX + 2) / gridSize)
+        let BRT = (Math.floor((tempY + (item.velY * item.speed) + 34) / gridSize) * state.gridSize) + (Math.floor((tempX + 30) / gridSize))
+        let BLT = (Math.floor((tempY + (item.velY * item.speed) + 34) / gridSize) * state.gridSize) + (Math.floor((tempX + 2) / gridSize))
+        let TRT = (Math.floor((tempY + (item.velY * item.speed) - 2) / gridSize) * state.gridSize) + (Math.floor((tempX + 30) / gridSize))
+
+
+        if ((state.map[TL] === 1 || state.map[BL] === 1) && item.velX === -1) {
+            console.log('x')
             item.velX = 0
-            item.x = (Math.floor((tempX + (item.velX * item.speed)) / gridSize) * 50) + 49
+            item.x = (Math.floor(tempX / gridSize) * gridSize)
         }
-        else if (state.map[locationBR] === 1 && state.map[locationTR] === 1 && item.velX === 1) {
+        else if ((state.map[BR] === 1 || state.map[TR] === 1) && item.velX === 1) {
+            console.log('x')
             item.velX = 0
-            item.x = (Math.floor((tempX + (item.velX * item.speed) - 2) / gridSize) * 50) + 18
+            item.x = (Math.floor(tempX / gridSize) * gridSize) + 18
         }
-        else if (state.map[locationBR] === 1 && state.map[locationBL] === 1 && item.velY === 1) {
+
+        if ((state.map[BRT] === 1 || state.map[BLT] === 1) && item.velY === 1) {
+            console.log('y')
             item.velY = 0
-            item.y = (Math.floor((tempY + (item.velY * item.speed) - 2) / gridSize) * 50) + 18
+            item.y = (Math.floor((tempY) / gridSize) * gridSize) + 17
         }
-        else if (state.map[locationTR] === 1 && state.map[locationTL] && item.velY === -1) {
+        else if ((state.map[TRT] === 1 || state.map[TLT] === 1) && item.velY === -1) {
+            console.log('y')
             item.velY = 0
-            item.y = (Math.floor((tempY + (item.velY * item.speed) - 2) / gridSize) * 50) + 50
+            item.y = (Math.floor(tempY / gridSize) * gridSize) + 1
         }
-        else {
 
 
-            if ((item.x += item.velX * item.speed) < 0) {
-                item.velX = 0
-                item.x = 0
-            }
-            else if ((item.x += item.velX * item.speed) >= 368) {
-                item.velX = 0
-                item.x = 367
-            }
-            else
-                item.x += item.velX * item.speed
 
-            if ((item.y += item.velY * item.speed) < 0) {
-                item.velY = 0
-                item.y = 0
-            }
-            else if ((item.y += item.velY * item.speed) >= 368) {
-                item.velY = 0
-                item.y = 367
-            }
-            else
-                item.y += item.velY * item.speed
-
+        if ((item.x += item.velX * item.speed) < 0) {
+            item.velX = 0
+            item.x = 0
         }
+        else if ((item.x += item.velX * item.speed) >= 368) {
+            item.velX = 0
+            item.x = 367
+        }
+        else
+            item.x += item.velX * item.speed
+
+        if ((item.y += item.velY * item.speed) < 0) {
+            item.velY = 0
+            item.y = 0
+        }
+        else if ((item.y += item.velY * item.speed) >= 368) {
+            item.velY = 0
+            item.y = 367
+        }
+        else
+            item.y += item.velY * item.speed
+
+
         //item.y += item.velY * item.speed
 
 
