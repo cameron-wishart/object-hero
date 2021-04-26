@@ -9,12 +9,15 @@ let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext('2d');
 
 let keyPresses = {};
+const heroAnim = [16, 0, 16, 32]
+let ticker = 0
 
 const image = new Image()
 image.src = './assets/hero.png';
 image.onload = function () {
     console.log('loaded')
 };
+
 
 const grass = new Image()
 grass.src = './assets/grass-tile.png';
@@ -100,10 +103,48 @@ function paintMap(state) {
 
 function paintPlayers(players) {
     for (let player in players) {
-        ctx.save()
-        ctx.scale(-1, 1)
-        ctx.drawImage(image, 0, 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
-        ctx.restore()
+        switch (players[player].dir) {
+            case 0:
+                if (players[player].isMoving)
+                    ctx.drawImage(image, heroAnim[players[player].anim], 16, 16, 16, players[player].x, players[player].y, 32, 32)
+                else
+                    ctx.drawImage(image, 16, 16, 16, 16, players[player].x, players[player].y, 32, 32)
+
+                break
+            case 1:
+                //ctx.drawImage(image, 0, 0, 16, 16, players[player].x, players[player].y, 32, 32)
+                if (players[player].isMoving) {
+                    ctx.save()
+                    ctx.scale(-1, 1)
+                    ctx.drawImage(image, heroAnim[players[player].anim], 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
+                    ctx.restore()
+
+                }
+                else {
+                    ctx.save()
+                    ctx.scale(-1, 1)
+                    ctx.drawImage(image, 16, 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
+                    ctx.restore()
+                }
+                break
+            case 2:
+                if (players[player].isMoving)
+                    ctx.drawImage(image, heroAnim[players[player].anim], 32, 16, 16, players[player].x, players[player].y, 32, 32)
+                else
+                    ctx.drawImage(image, 16, 32, 16, 16, players[player].x, players[player].y, 32, 32)
+
+                break
+            case 3:
+                if (players[player].isMoving)
+                    ctx.drawImage(image, heroAnim[players[player].anim], 0, 16, 16, players[player].x, players[player].y, 32, 32)
+                else
+                    ctx.drawImage(image, 16, 0, 16, 16, players[player].x, players[player].y, 32, 32)
+
+                break
+            default:
+
+        }
+        //ctx.drawImage(image, 0, 0, 16, 16, players[player].x, players[player].y, 32, 32)
     }
 }
 

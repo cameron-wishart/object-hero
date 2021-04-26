@@ -31,7 +31,7 @@ io.on('connection', socket => {
     function handleJoinGame() {
         console.log('joining')
         socket.join('main')
-        state['main'].players[socket.id] = { x: 0, y: 0, velX: 0, velY: 0, dir: 0, isMoving: false, speed: 2, inventory: [] }
+        state['main'].players[socket.id] = { x: 0, y: 0, velX: 0, velY: 0, dir: 0, isMoving: false, anim: 0, speed: 2, inventory: [] }
         clientRooms[socket.id] = 'main'
 
     }
@@ -41,7 +41,7 @@ io.on('connection', socket => {
         state['main'] = createGameState()
         clientRooms[socket.id] = 'main'
         socket.join('main')
-        state['main'].players[socket.id] = { x: 0, y: 0, velX: 0, velY: 0, dir: 0, isMoving: false, speed: 2, inventory: [] }
+        state['main'].players[socket.id] = { x: 0, y: 0, velX: 0, velY: 0, dir: 0, isMoving: false, anim: 0, speed: 2, inventory: [] }
         startGameInterval('main')
 
     }
