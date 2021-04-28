@@ -42,18 +42,15 @@ socket.on('gameState', (state) => { handleGame(state) })
 
 document.getElementById("start_button").addEventListener("click", () => {
     init()
-    socket.emit('joinGame', 'player joining')
+    socket.emit('joinGame', { room: 'main', x: 48, y: 64, dir: 2 })
 })
 
 
 function init() {
-
-
-
+    canvas.style.display = 'block'
     window.addEventListener('keydown', keyDownListener);
     function keyDownListener(event) {
         if (!keyPresses[event.key] === true) {
-
             keyPresses[event.key] = true;
             socket.emit('keypress', keyPresses)
         }
@@ -67,6 +64,14 @@ function init() {
 }
 
 function paintGame(state) {
+    for (let player in state.players)
+        if (player === socket.id) {
+            if (state.players[player].y < 0) {
+                console.log(state.exit.north)
+                socket.emit('joinGame', state.exit.north)
+            }
+        }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     paintMap(state)
     paintPlayers(state.players)
@@ -107,6 +112,12 @@ function paintPlayers(players) {
             case 0:
                 if (players[player].isMoving)
                     ctx.drawImage(image, heroAnim[players[player].anim], 16, 16, 16, players[player].x, players[player].y, 32, 32)
+                else if (players[player].atk) {
+                    console.log('hit')
+                    ctx.drawImage(image, 16, 16, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.fillStyle = PLAYER_COLOR
+                    ctx.fillRect(players[player].x, players[player].y - 32, 32, 32)
+                }
                 else
                     ctx.drawImage(image, 16, 16, 16, 16, players[player].x, players[player].y, 32, 32)
 
@@ -120,6 +131,14 @@ function paintPlayers(players) {
                     ctx.restore()
 
                 }
+                else if (players[player].atk) {
+                    ctx.save()
+                    ctx.scale(-1, 1)
+                    ctx.drawImage(image, heroAnim[players[player].anim], 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
+                    ctx.restore()
+                    ctx.fillStyle = PLAYER_COLOR
+                    ctx.fillRect(players[player].x + 32, players[player].y, 32, 32)
+                }
                 else {
                     ctx.save()
                     ctx.scale(-1, 1)
@@ -130,6 +149,11 @@ function paintPlayers(players) {
             case 2:
                 if (players[player].isMoving)
                     ctx.drawImage(image, heroAnim[players[player].anim], 32, 16, 16, players[player].x, players[player].y, 32, 32)
+                else if (players[player].atk) {
+                    ctx.drawImage(image, 16, 32, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.fillStyle = PLAYER_COLOR
+                    ctx.fillRect(players[player].x, players[player].y + 32, 32, 32)
+                }
                 else
                     ctx.drawImage(image, 16, 32, 16, 16, players[player].x, players[player].y, 32, 32)
 
@@ -137,6 +161,11 @@ function paintPlayers(players) {
             case 3:
                 if (players[player].isMoving)
                     ctx.drawImage(image, heroAnim[players[player].anim], 0, 16, 16, players[player].x, players[player].y, 32, 32)
+                else if (players[player].atk) {
+                    ctx.drawImage(image, 16, 0, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.fillStyle = PLAYER_COLOR
+                    ctx.fillRect(players[player].x - 32, players[player].y, 32, 32)
+                }
                 else
                     ctx.drawImage(image, 16, 0, 16, 16, players[player].x, players[player].y, 32, 32)
 
