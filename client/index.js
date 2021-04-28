@@ -86,13 +86,10 @@ function init() {
 function paintGame(state) {
     for (let player in state.players)
         if (player === socket.id) {
-            console.log(state.players[player].y)
             if (state.players[player].y < 0) {
-                console.log(state.exit.north)
                 socket.emit('joinGame', state.exit.north)
             }
             else if (state.players[player].y > 600) {
-                console.log('hit')
                 socket.emit('joinGame', state.exit.south)
             }
         }

@@ -5,7 +5,6 @@ module.exports = {
 
 function attack(enemies, player) {
 
-    console.log(player.x, player.y, player.dir)
     let hit = false
     let tempEnemiesRemain = []
     enemies.map((enemy, index) => {
@@ -36,7 +35,6 @@ function attack(enemies, player) {
 
         hit = false
     })
-    console.log(enemies)
     return tempEnemiesRemain
 }
 
