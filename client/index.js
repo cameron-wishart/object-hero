@@ -10,15 +10,31 @@ let ctx = canvas.getContext('2d');
 
 let keyPresses = {};
 const heroAnim = [16, 0, 16, 32]
-let ticker = 0
 
-const image = new Image()
-image.src = './assets/hero.png';
-image.onload = function () {
+/**
+ * CHARACTERS
+ */
+const player_sprite = new Image()
+player_sprite.src = './assets/hero.png';
+player_sprite.onload = function () {
     console.log('loaded')
 };
 
+const blue_slime_sprite = new Image()
+blue_slime_sprite.src = './assets/blue_slime.png';
+blue_slime_sprite.onload = function () {
+    console.log('loaded')
+};
 
+const skeleton_sprite = new Image()
+skeleton_sprite.src = './assets/skeleton.png';
+skeleton_sprite.onload = function () {
+    console.log('loaded')
+};
+
+/**
+ * TILES
+ */
 const grass = new Image()
 grass.src = './assets/grass-tile.png';
 grass.onload = function () {
@@ -36,7 +52,11 @@ tileSheet.src = './assets/tiles-map.png';
 tileSheet.onload = function () {
     console.log('tilemap loaded')
 };
-//socket events
+
+
+/**
+ * SOCKET EVENTS
+ */
 socket.on('gameState', (state) => { handleGame(state) })
 
 
@@ -66,14 +86,20 @@ function init() {
 function paintGame(state) {
     for (let player in state.players)
         if (player === socket.id) {
+            console.log(state.players[player].y)
             if (state.players[player].y < 0) {
                 console.log(state.exit.north)
                 socket.emit('joinGame', state.exit.north)
+            }
+            else if (state.players[player].y > 600) {
+                console.log('hit')
+                socket.emit('joinGame', state.exit.south)
             }
         }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     paintMap(state)
+    paintEnemies(state.enemies)
     paintPlayers(state.players)
 }
 
@@ -106,20 +132,31 @@ function paintMap(state) {
     }
 }
 
+function paintEnemies(enemies) {
+    enemies.map((enemy) => {
+        switch (enemy.type) {
+            case 'skeleton':
+                ctx.drawImage(skeleton_sprite, 0, 0, 32, 32, enemy.x, enemy.y, 32, 32)
+                break
+            default:
+        }
+
+    })
+}
+
 function paintPlayers(players) {
     for (let player in players) {
         switch (players[player].dir) {
             case 0:
                 if (players[player].isMoving)
-                    ctx.drawImage(image, heroAnim[players[player].anim], 16, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, heroAnim[players[player].anim], 16, 16, 16, players[player].x, players[player].y, 32, 32)
                 else if (players[player].atk) {
-                    console.log('hit')
-                    ctx.drawImage(image, 16, 16, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, 16, 16, 16, 16, players[player].x, players[player].y, 32, 32)
                     ctx.fillStyle = PLAYER_COLOR
                     ctx.fillRect(players[player].x, players[player].y - 32, 32, 32)
                 }
                 else
-                    ctx.drawImage(image, 16, 16, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, 16, 16, 16, 16, players[player].x, players[player].y, 32, 32)
 
                 break
             case 1:
@@ -127,14 +164,14 @@ function paintPlayers(players) {
                 if (players[player].isMoving) {
                     ctx.save()
                     ctx.scale(-1, 1)
-                    ctx.drawImage(image, heroAnim[players[player].anim], 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, heroAnim[players[player].anim], 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
                     ctx.restore()
 
                 }
                 else if (players[player].atk) {
                     ctx.save()
                     ctx.scale(-1, 1)
-                    ctx.drawImage(image, heroAnim[players[player].anim], 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, heroAnim[players[player].anim], 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
                     ctx.restore()
                     ctx.fillStyle = PLAYER_COLOR
                     ctx.fillRect(players[player].x + 32, players[player].y, 32, 32)
@@ -142,32 +179,32 @@ function paintPlayers(players) {
                 else {
                     ctx.save()
                     ctx.scale(-1, 1)
-                    ctx.drawImage(image, 16, 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, 16, 0, 16, 16, - players[player].x - 32, players[player].y, 32, 32)
                     ctx.restore()
                 }
                 break
             case 2:
                 if (players[player].isMoving)
-                    ctx.drawImage(image, heroAnim[players[player].anim], 32, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, heroAnim[players[player].anim], 32, 16, 16, players[player].x, players[player].y, 32, 32)
                 else if (players[player].atk) {
-                    ctx.drawImage(image, 16, 32, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, 16, 32, 16, 16, players[player].x, players[player].y, 32, 32)
                     ctx.fillStyle = PLAYER_COLOR
                     ctx.fillRect(players[player].x, players[player].y + 32, 32, 32)
                 }
                 else
-                    ctx.drawImage(image, 16, 32, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, 16, 32, 16, 16, players[player].x, players[player].y, 32, 32)
 
                 break
             case 3:
                 if (players[player].isMoving)
-                    ctx.drawImage(image, heroAnim[players[player].anim], 0, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, heroAnim[players[player].anim], 0, 16, 16, players[player].x, players[player].y, 32, 32)
                 else if (players[player].atk) {
-                    ctx.drawImage(image, 16, 0, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, 16, 0, 16, 16, players[player].x, players[player].y, 32, 32)
                     ctx.fillStyle = PLAYER_COLOR
                     ctx.fillRect(players[player].x - 32, players[player].y, 32, 32)
                 }
                 else
-                    ctx.drawImage(image, 16, 0, 16, 16, players[player].x, players[player].y, 32, 32)
+                    ctx.drawImage(player_sprite, 16, 0, 16, 16, players[player].x, players[player].y, 32, 32)
 
                 break
             default:

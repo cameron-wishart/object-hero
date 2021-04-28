@@ -53,7 +53,7 @@ io.on('connection', socket => {
     socket.on('disconnect', () => {
         if (state[clientRooms[socket.id]]?.players[socket.id])
             delete state[clientRooms[socket.id]].players[socket.id]
-        console.log('Client disconnected')
+        //console.log('Client disconnected')
     });
 })
 
