@@ -40,6 +40,7 @@ function main() {
                 health: 2,
             },
         ],
+        chat: [],
         tick: 0,
         gridSize: 20,
         map:
@@ -98,6 +99,7 @@ function empty() {
             },
         ]
         ,
+        chat: [],
         tick: 0,
         gridSize: 20,
         enemySpawnAreas: {

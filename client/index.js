@@ -58,21 +58,23 @@ tileSheet.onload = function () {
  * SOCKET EVENTS
  */
 socket.on('gameState', (state) => { handleGame(state) })
-
+socket.on('newMessage', (msg) => { showChat(msg) })
 
 var start_button = document.getElementById("start_button")
-
+var name_bar = document.getElementById('name')
 start_button.addEventListener("click", () => {
+    console.log('hit')
     init()
-    socket.emit('joinGame', { room: 'main', x: 48, y: 64, dir: 2 })
+    socket.emit('joinGame', { room: 'main', x: 48, y: 64, dir: 2, name: name_bar.value })
 })
 
+var chatBox = document.getElementById('chatBox')
+var messages = document.getElementById('messages')
 
 function init() {
     canvas.style.display = 'block'
-
-    start_button.style.display = 'none'
-
+    start_button.parentElement.parentElement.style.display = 'none'
+    chatBox.parentElement.style.display = 'block'
     // window.addEventListener('click', clickListener)
     // function clickListener(event) {
     //     keyPresses['click'] = true;
@@ -81,9 +83,14 @@ function init() {
 
     window.addEventListener('keydown', keyDownListener);
     function keyDownListener(event) {
-        if (!keyPresses[event.key] === true) {
-            keyPresses[event.key] = true;
-            socket.emit('keypress', keyPresses)
+        if (chatBox !== document.activeElement)
+            if (!keyPresses[event.key] === true) {
+                keyPresses[event.key] = true;
+                socket.emit('keypress', keyPresses)
+            }
+        if (event.key === 'Enter') {
+            socket.emit('message', chatBox.value)
+            chatBox.value = ''
         }
     }
 
@@ -97,7 +104,6 @@ function init() {
 function paintGame(state) {
     for (let player in state.players)
         if (player === socket.id) {
-            console.log(state.players[player].y)
             if (state.players[player].y < 0) {
                 socket.emit('joinGame', state.exit.north)
             }
@@ -108,6 +114,7 @@ function paintGame(state) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     paintMap(state)
+    //showChat(state)
     paintEnemies(state.enemies)
     paintPlayers(state.players)
     paintSpawn(state.enemySpawnAreas)
@@ -146,7 +153,6 @@ function paintMap(state) {
 function paintSpawn(spawners) {
     //console.log(spawners)
     Object.keys(spawners).map(spawnBox => {
-        console.log(spawners[spawnBox].maxX)
         let x = spawners[spawnBox].minX
         ctx.strokeStyle = '#ff0000'
         //ctx.fillStyle = PLAYER_COLOR
@@ -236,6 +242,16 @@ function paintPlayers(players) {
         }
         //ctx.drawImage(image, 0, 0, 16, 16, players[player].x, players[player].y, 32, 32)
     }
+}
+
+function showChat(msg) {
+    const { name, message } = msg
+    // chat.map((msg) => {
+    let listItem = document.createElement("li")
+    let text = document.createTextNode(`${name} - ${message}`)
+    listItem.appendChild(text)
+    messages.appendChild(listItem)
+    // })
 }
 
 function handleGame(state) {

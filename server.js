@@ -30,13 +30,13 @@ io.on('connection', socket => {
     })
 
     function handleJoinGame(obj) {
-        let { room, x, y, dir } = obj
+        let { room, x, y, dir, name } = obj
         if (clientRooms[socket.id] !== undefined) {
             socket.leave(clientRooms[socket.id])
             //delete state[clientRooms[socket.id]].players[socket.id]
         }
         socket.join(room)
-        state[room].players[socket.id] = { x: x, y: y, velX: 0, velY: 0, dir: dir, isMoving: false, isCol: false, atk: false, coolDown: 0, anim: 0, speed: 4, inventory: [] }
+        state[room].players[socket.id] = { x: x, y: y, velX: 0, velY: 0, dir: dir, isMoving: false, isCol: false, atk: false, coolDown: 0, anim: 0, speed: 4, name: name, inventory: [] }
         clientRooms[socket.id] = room
         //console.log(state)
     }
@@ -50,6 +50,11 @@ io.on('connection', socket => {
 
     socket.on('keypress', (keyPress) => {
         handleKeyPress(keyPress, state[clientRooms[socket.id]], socket)
+    })
+
+    socket.on('message', (msg) => {
+        state[clientRooms[socket.id]].chat.push(msg)
+        io.sockets.in(clientRooms[socket.id]).emit('newMessage', { message: msg, name: state[clientRooms[socket.id]].players[socket.id].name })
     })
 
     socket.on('disconnect', () => {

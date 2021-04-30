@@ -3,11 +3,14 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #B2BEB5;
+            background-color: #3C4042;
+            font-family: 'MedievalSharp', cursive;
         }
 
         .game-container {
@@ -17,7 +20,75 @@
             place-items: center;
         }
 
-        .button {}
+        .titleScreenOuter {
+            height: 55vh;
+            width: 63vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            background-color: #B27F5D;
+        }
+
+        .titleScreen {
+            height: 50vh;
+            width: 60vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            background-color: #EAECCA;
+        }
+
+        .button {
+            height: 50px;
+            width: 30vw;
+            background-color: #4FA6A7;
+        }
+
+        .button:hover {
+            background-color: #496c6d;
+        }
+
+        .name {
+            width: 30vw;
+            height: 50px;
+            font-size: 24px;
+        }
+
+        h1 {
+            color: #C23D4F;
+        }
+
+        .chatBar {
+            position: fixed;
+            display: none;
+            height: 80vh;
+            width: 15vw;
+            bottom: 50px;
+            left: 10px;
+            padding: 4px;
+            background-color: #EAECCA;
+        }
+
+        .chatBox {
+            position: absolute;
+            display: block;
+            bottom: 0;
+            left: 0;
+            width: 15vw;
+            height: 20px;
+        }
+
+        ul {
+            padding-left: 10px;
+            height: 95%;
+            overflow: scroll;
+        }
+
+        li {
+            list-style: none;
+        }
 
         canvas {
             background-color: #f1f1f1;
@@ -33,7 +104,19 @@
     <div class="game-container">
 
         <canvas id="game" width="640" height="640"></canvas>
-        <button class="button" id="start_button">Press to start</button>
+        <div class="titleScreenOuter">
+            <div class="titleScreen">
+                <h1>Object Hero</h1>
+                <input type="text" class="name" id="name" value="" placeholder="Enter your name... " />
+                <button class="button" id="start_button">Press to start</button>
+            </div>
+        </div>
+        <div class="chatBar">
+            <ul id="messages">
+
+            </ul>
+            <input class="chatBox" id="chatBox" type="text" value="" placeholder="type here..." />
+        </div>
     </div>
 </body>
 
