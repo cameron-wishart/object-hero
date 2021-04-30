@@ -60,7 +60,9 @@ tileSheet.onload = function () {
 socket.on('gameState', (state) => { handleGame(state) })
 
 
-document.getElementById("start_button").addEventListener("click", () => {
+var start_button = document.getElementById("start_button")
+
+start_button.addEventListener("click", () => {
     init()
     socket.emit('joinGame', { room: 'main', x: 48, y: 64, dir: 2 })
 })
@@ -68,6 +70,15 @@ document.getElementById("start_button").addEventListener("click", () => {
 
 function init() {
     canvas.style.display = 'block'
+
+    start_button.style.display = 'none'
+
+    // window.addEventListener('click', clickListener)
+    // function clickListener(event) {
+    //     keyPresses['click'] = true;
+    //     socket.emit('keypress', keyPresses)
+    // }
+
     window.addEventListener('keydown', keyDownListener);
     function keyDownListener(event) {
         if (!keyPresses[event.key] === true) {
@@ -86,6 +97,7 @@ function init() {
 function paintGame(state) {
     for (let player in state.players)
         if (player === socket.id) {
+            console.log(state.players[player].y)
             if (state.players[player].y < 0) {
                 socket.emit('joinGame', state.exit.north)
             }
@@ -98,6 +110,7 @@ function paintGame(state) {
     paintMap(state)
     paintEnemies(state.enemies)
     paintPlayers(state.players)
+    paintSpawn(state.enemySpawnAreas)
 }
 
 function paintMap(state) {
@@ -128,6 +141,20 @@ function paintMap(state) {
 
     }
 }
+
+
+function paintSpawn(spawners) {
+    //console.log(spawners)
+    Object.keys(spawners).map(spawnBox => {
+        console.log(spawners[spawnBox].maxX)
+        let x = spawners[spawnBox].minX
+        ctx.strokeStyle = '#ff0000'
+        //ctx.fillStyle = PLAYER_COLOR
+        //ctx.strokeRect(50, 50, 50, 100)
+        ctx.strokeRect(x, spawners[spawnBox].minY, spawners[spawnBox].maxX - spawners[spawnBox].minX, spawners[spawnBox].maxY - spawners[spawnBox].minY)
+    })
+}
+
 
 function paintEnemies(enemies) {
     enemies.map((enemy) => {

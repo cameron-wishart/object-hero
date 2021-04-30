@@ -19,7 +19,7 @@ const state = {}
 
 io.on('connection', socket => {
     //console.log('a user connected');
-
+    console.log(socket.id)
     //socket.on('newGame', handleNewGame)
     socket.on('joinGame', (obj) => {
         let { room } = obj
@@ -31,12 +31,14 @@ io.on('connection', socket => {
 
     function handleJoinGame(obj) {
         let { room, x, y, dir } = obj
-        if (clientRooms[socket.id] !== undefined)
+        if (clientRooms[socket.id] !== undefined) {
             socket.leave(clientRooms[socket.id])
+            //delete state[clientRooms[socket.id]].players[socket.id]
+        }
         socket.join(room)
-        state[room].players[socket.id] = { x: x, y: y, velX: 0, velY: 0, dir: dir, isMoving: false, isCol: false, atk: false, anim: 0, speed: 4, inventory: [] }
+        state[room].players[socket.id] = { x: x, y: y, velX: 0, velY: 0, dir: dir, isMoving: false, isCol: false, atk: false, coolDown: 0, anim: 0, speed: 4, inventory: [] }
         clientRooms[socket.id] = room
-        //console.log(clientRooms)
+        //console.log(state)
     }
 
     function handleNewGame(room) {
@@ -59,6 +61,7 @@ io.on('connection', socket => {
 
 function startGameInterval(room) {
     const intervalId = setInterval(() => {
+        //console.log(room)
         gameLoop(state[room])
         emitGameState(room, state[room])
     }, 1000 / 30);

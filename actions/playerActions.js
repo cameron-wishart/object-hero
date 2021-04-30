@@ -38,12 +38,12 @@ function attack(enemies, player) {
     return tempEnemiesRemain
 }
 
-function playerMovement(player, gridSize) {
+function playerMovement(player, gridSize, state) {
 
     let tempY = player.y
     let tempX = player.x
 
-    if (player.isMoving && state.tick === 0) {
+    if (player.isMoving && (state.tick % 6) === 0) {
         if (player.anim < 3)
             player.anim++
         else

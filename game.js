@@ -6,6 +6,9 @@ module.exports = {
 
 const { main, empty } = require('./maps/map')
 const { attack, playerMovement } = require('./actions/playerActions')
+const { spawner } = require('./actions/enemyActions')
+
+
 function createGameState(room) {
     let newMap = []
     switch (room) {
@@ -22,25 +25,37 @@ function createGameState(room) {
 }
 
 function gameLoop(state) {
+
     const canvasSize = 640
     const gridSize = canvasSize / state.gridSize
-    if (state.tick === 3)
+    if (state.tick === 30)
         state.tick = 0
     else
         state.tick++
 
+
+    for (spawn in state.enemySpawnAreas) {
+        spawner(state.enemySpawnAreas[spawn], state.enemies)
+    }
 
 
     for (item in state.players) {
 
         const player = state.players[item]
 
-        if (player.atk === true && state.tick === 0) {
+        if (player.atk === true && player.coolDown === 0) {
             state.enemies = attack(state.enemies, player)
+            player.coolDown++
+        }
+        else if (player.coolDown > 0 && player.coolDown < 5) {
+            player.coolDown++
+        }
+        else if (player.coolDown === 5) {
             player.atk = false
+            player.coolDown = 0
         }
 
-        playerMovement(player, gridSize)
+        playerMovement(player, gridSize, state)
 
     }
 }
@@ -69,10 +84,11 @@ function handleKeyPress(keyPresses, state, socket) {
                     state.players[socket.id].dir = 1
                     break;
                 case 'e':
-                    if (state.players[socket.id].atk === true)
-                        state.players[socket.id].atk = false
-                    else
-                        state.players[socket.id].atk = true
+                    state.players[socket.id].atk = true
+                    break
+                case 'click':
+                    state.players[socket.id].atk = true
+                    break
                 default:
             }
     })
