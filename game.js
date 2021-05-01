@@ -6,7 +6,7 @@ module.exports = {
 
 const { main, empty } = require('./maps/map')
 const { attack, playerMovement } = require('./actions/playerActions')
-const { spawner } = require('./actions/enemyActions')
+const { spawner, idleMovement, findPlayer } = require('./actions/enemyActions')
 
 
 function createGameState(room) {
@@ -56,6 +56,27 @@ function gameLoop(state) {
         }
 
         playerMovement(player, gridSize, state)
+
+    }
+    for (item in state.enemies) {
+
+        const enemy = state.enemies[item]
+
+        console.log(enemy.target)
+
+        findPlayer(enemy, state.players)
+
+        if (enemy.tick === 0) {
+
+            let newDir = Math.floor(Math.random() * 4)
+            enemy.dir = newDir
+        }
+        if (!enemy.target && enemy.tick < 60) {
+            idleMovement(enemy, gridSize, state)
+            enemy.tick++
+        }
+        if (enemy.tick === 60)
+            enemy.tick = 0
 
     }
 }

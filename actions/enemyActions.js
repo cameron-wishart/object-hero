@@ -1,5 +1,7 @@
 module.exports = {
-    spawner
+    spawner,
+    idleMovement,
+    findPlayer,
 }
 
 const { skeleton } = require('../sprites/skeleton')
@@ -23,6 +25,56 @@ function spawner(curSpawner, curEnemies) {
     }
 }
 
-function spawnEnemy() {
+function idleMovement(enemy, gridSize, state) {
 
+
+    let TL = Math.floor((enemy.y - 1) / gridSize) * 20 + Math.floor((enemy.x - 1) / gridSize)
+    let BR = Math.floor((enemy.y + 33) / gridSize) * 20 + Math.floor((enemy.x + 33) / gridSize)
+
+
+    if (enemy.tick % 10 === 0 && enemy.tick <= 30) {
+        if (enemy.anim < 3)
+            enemy.anim++
+        else
+            enemy.anim = 0
+    }
+
+    if (enemy.tick < 30)
+        switch (enemy.dir) {
+            case 0:
+                if (state.map[TL] !== 1 && enemy.y > state.enemySpawnAreas.skeletonSpawnArea.minY)
+                    enemy.y -= enemy.speed
+                break
+            case 1:
+                if (state.map[BR] !== 1 && enemy.x < state.enemySpawnAreas.skeletonSpawnArea.maxX)
+                    enemy.x += enemy.speed
+                break
+            case 2:
+                if (state.map[BR] !== 1 && enemy.y < state.enemySpawnAreas.skeletonSpawnArea.maxY)
+                    enemy.y += enemy.speed
+                break
+            case 3:
+                if (state.map[TL] !== 1 && enemy.x > state.enemySpawnAreas.skeletonSpawnArea.minX)
+                    enemy.x -= enemy.speed
+                break
+            default:
+        }
+    else if (enemy.tick < 60) {
+
+    }
+
+}
+
+
+function findPlayer(enemy, players) {
+
+    for (player in players) {
+        let tempPlayer = players[player]
+        let distance = Math.sqrt(((tempPlayer.x - enemy.x) * (tempPlayer.x - enemy.x)) + ((tempPlayer.y - enemy.y) * (tempPlayer.y - enemy.y)))
+        if (distance < 100 || distance < enemy.target) {
+            enemy.target = player
+            enemy.x = tempPlayer.x
+            enemy.y = tempPlayer.y
+        }
+    }
 }

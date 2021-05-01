@@ -10,6 +10,7 @@ let ctx = canvas.getContext('2d');
 
 let keyPresses = {};
 const heroAnim = [16, 0, 16, 32]
+const skeletonAnim = [32, 0, 32, 64]
 
 /**
  * CHARACTERS
@@ -166,7 +167,24 @@ function paintEnemies(enemies) {
     enemies.map((enemy) => {
         switch (enemy.type) {
             case 'skeleton':
-                ctx.drawImage(skeleton_sprite, 0, 0, 32, 32, enemy.x, enemy.y, 32, 32)
+                switch (enemy.dir) {
+                    case 0:
+
+                        ctx.drawImage(skeleton_sprite, skeletonAnim[enemy.anim], 96, 32, 32, enemy.x, enemy.y, 32, 32)
+                        break
+                    case 1:
+
+                        ctx.drawImage(skeleton_sprite, skeletonAnim[enemy.anim], 64, 32, 32, enemy.x, enemy.y, 32, 32)
+                        break
+                    case 2:
+
+                        ctx.drawImage(skeleton_sprite, skeletonAnim[enemy.anim], 0, 32, 32, enemy.x, enemy.y, 32, 32)
+                        break
+                    case 3:
+
+                        ctx.drawImage(skeleton_sprite, skeletonAnim[enemy.anim], 32, 32, 32, enemy.x, enemy.y, 32, 32)
+                        break
+                }
                 break
             default:
         }
