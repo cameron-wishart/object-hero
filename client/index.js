@@ -64,7 +64,6 @@ socket.on('newMessage', (msg) => { showChat(msg) })
 var start_button = document.getElementById("start_button")
 var name_bar = document.getElementById('name')
 start_button.addEventListener("click", () => {
-    console.log('hit')
     init()
     socket.emit('joinGame', { room: 'main', x: 48, y: 64, dir: 2, name: name_bar.value })
 })
@@ -152,7 +151,6 @@ function paintMap(state) {
 
 
 function paintSpawn(spawners) {
-    //console.log(spawners)
     Object.keys(spawners).map(spawnBox => {
         let x = spawners[spawnBox].minX
         ctx.strokeStyle = '#ff0000'
