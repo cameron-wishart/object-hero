@@ -2,6 +2,7 @@ module.exports = {
     spawner,
     idleMovement,
     findPlayer,
+    attackPlayer,
 }
 
 const { skeleton } = require('../sprites/skeleton')
@@ -31,14 +32,6 @@ function idleMovement(enemy, gridSize, state) {
     let TL = Math.floor((enemy.y - 1) / gridSize) * 20 + Math.floor((enemy.x - 1) / gridSize)
     let BR = Math.floor((enemy.y + 33) / gridSize) * 20 + Math.floor((enemy.x + 33) / gridSize)
 
-
-    if (enemy.tick % 10 === 0 && enemy.tick <= 30) {
-        if (enemy.anim < 3)
-            enemy.anim++
-        else
-            enemy.anim = 0
-    }
-
     if (enemy.tick < 30)
         switch (enemy.dir) {
             case 0:
@@ -66,15 +59,53 @@ function idleMovement(enemy, gridSize, state) {
 }
 
 
-function findPlayer(enemy, players) {
+function findPlayer(enemy, players, spawner) {
 
     for (player in players) {
         let tempPlayer = players[player]
+        //console.log(tempPlayer)
+
         let distance = Math.sqrt(((tempPlayer.x - enemy.x) * (tempPlayer.x - enemy.x)) + ((tempPlayer.y - enemy.y) * (tempPlayer.y - enemy.y)))
-        if (distance < 100 || distance < enemy.target) {
+        if (tempPlayer.y > spawner.skeletonSpawnArea.maxY || tempPlayer.x < spawner.skeletonSpawnArea.minX && enemy.target === player)
+            enemy.target = null
+        else if (distance < 100 || distance < enemy?.target) {
             enemy.target = player
-            enemy.x = tempPlayer.x
-            enemy.y = tempPlayer.y
         }
     }
+}
+
+function attackPlayer(enemy, players, spawner) {
+    let targetPlayer = players[enemy.target]
+
+    if (targetPlayer !== undefined) {
+
+        let skeletonSpawn = spawner.skeletonSpawnArea
+        let distance = Math.sqrt(((targetPlayer.x - enemy.x) * (targetPlayer.x - enemy.x)) + ((targetPlayer.y - enemy.y) * (targetPlayer.y - enemy.y)))
+
+        if (targetPlayer.y > skeletonSpawn.maxY)
+            enemy.target = null
+        if (enemy.x < targetPlayer.x) {
+            enemy.dir = 1
+            enemy.x += enemy.speed * 2
+        }
+        else if (enemy.x > targetPlayer.x + 32) {
+            enemy.dir = 3
+            enemy.x -= enemy.speed * 2
+        }
+        else if (enemy.y > targetPlayer.y + 32) {
+            enemy.dir = 0
+            enemy.y -= enemy.speed * 2
+        }
+        else if (enemy.y < targetPlayer.y) {
+            enemy.dir = 2
+            enemy.y += enemy.speed * 2
+        }
+
+        if (distance <= 32 && enemy.tick === 0) {
+            targetPlayer.isHit = true
+            targetPlayer.health--
+        }
+    }
+    else
+        enemy.target = null
 }

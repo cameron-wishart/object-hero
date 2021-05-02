@@ -19,7 +19,6 @@ const state = {}
 
 io.on('connection', socket => {
     //console.log('a user connected');
-    console.log(socket.id)
     //socket.on('newGame', handleNewGame)
     socket.on('joinGame', (obj) => {
         let { room } = obj
@@ -36,7 +35,7 @@ io.on('connection', socket => {
             //delete state[clientRooms[socket.id]].players[socket.id]
         }
         socket.join(room)
-        state[room].players[socket.id] = { x: x, y: y, velX: 0, velY: 0, dir: dir, isMoving: false, isCol: false, atk: false, coolDown: 0, anim: 0, speed: 4, name: name, inventory: [] }
+        state[room].players[socket.id] = { x: x, y: y, velX: 0, velY: 0, dir: dir, isMoving: false, isCol: false, atk: false, coolDown: 0, anim: 0, speed: 4, name: name, health: 3, isHit: false, inventory: [] }
         clientRooms[socket.id] = room
         //console.log(state)
     }
@@ -55,6 +54,12 @@ io.on('connection', socket => {
     socket.on('message', (msg) => {
         state[clientRooms[socket.id]].chat.push(msg)
         io.sockets.in(clientRooms[socket.id]).emit('newMessage', { message: msg, name: state[clientRooms[socket.id]].players[socket.id].name })
+    })
+
+    socket.on('gameOver', (msg) => {
+        console.log('dead')
+        if (state[clientRooms[socket.id]]?.players[socket.id])
+            delete state[clientRooms[socket.id]].players[socket.id]
     })
 
     socket.on('disconnect', () => {

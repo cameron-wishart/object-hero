@@ -63,6 +63,7 @@ socket.on('newMessage', (msg) => { showChat(msg) })
 
 var start_button = document.getElementById("start_button")
 var name_bar = document.getElementById('name')
+var retry_button = document.getElementById('retry')
 start_button.addEventListener("click", () => {
     init()
     socket.emit('joinGame', { room: 'main', x: 48, y: 64, dir: 2, name: name_bar.value })
@@ -82,28 +83,37 @@ function init() {
     // }
 
     window.addEventListener('keydown', keyDownListener);
-    function keyDownListener(event) {
-        if (chatBox !== document.activeElement)
-            if (!keyPresses[event.key] === true) {
-                keyPresses[event.key] = true;
-                socket.emit('keypress', keyPresses)
-            }
-        if (event.key === 'Enter') {
-            socket.emit('message', chatBox.value)
-            chatBox.value = ''
-        }
-    }
+
 
     window.addEventListener('keyup', keyUpListener);
-    function keyUpListener(event) {
-        delete keyPresses[event.key]
-        socket.emit('keypress', keyPresses)
+
+}
+
+function keyDownListener(event) {
+    if (chatBox !== document.activeElement)
+        if (!keyPresses[event.key] === true) {
+            keyPresses[event.key] = true;
+            socket.emit('keypress', keyPresses)
+        }
+    if (event.key === 'Enter') {
+        socket.emit('message', chatBox.value)
+        chatBox.value = ''
     }
+}
+
+function keyUpListener(event) {
+    delete keyPresses[event.key]
+    socket.emit('keypress', keyPresses)
 }
 
 function paintGame(state) {
     for (let player in state.players)
         if (player === socket.id) {
+            if (state.players[player].health === 0) {
+                socket.emit('gameOver', 'dead')
+                gameOver()
+                break
+            }
             if (state.players[player].y < 0) {
                 socket.emit('joinGame', state.exit.north)
             }
@@ -272,4 +282,18 @@ function showChat(msg) {
 
 function handleGame(state) {
     requestAnimationFrame(() => paintGame(state))
+}
+
+retry_button.addEventListener("click", () => {
+    start_button.parentElement.parentElement.style.display = 'block'
+    retry_button.style.display = 'none'
+})
+
+function gameOver() {
+    //window.addEventListener('keydown', keyDownListener);
+    window.removeEventListener('keydown', keyDownListener)
+    window.removeEventListener('keyup', keyUpListener)
+    canvas.style.display = 'none'
+    chatBox.parentElement.style.display = 'none'
+    retry_button.style.display = 'block'
 }
